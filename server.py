@@ -7,16 +7,27 @@ from dotenv import load_dotenv
 load_dotenv()
 app = FastAPI()
 
-# Allow frontend access
+# SAFEST: allow CORS fully for now
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=["*"],  # TEMP: allow any frontend (lock this down later)
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Preflight OPTIONS fallback for safety (force-handle any failing preflight requests)
+@app.options("/{rest_of_path:path}")
+async def preflight_handler():
+    return {"status": "Preflight OK"}
+
+# Simple healthcheck
+@app.get("/")
+async def root():
+    return {"message": "NLP to Shader API is running!"}
+
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
+
 
 FEW_SHOT_EXAMPLES = [
     {
