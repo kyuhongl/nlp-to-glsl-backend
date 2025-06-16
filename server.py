@@ -212,6 +212,10 @@ void main() {
     }
 ]
 
+@app.get("/")
+async def root():
+    return {"message": "NLP to Shader API is running!"}
+
 @app.post("/generate")
 async def generate(request: Request):
     body = await request.json()
